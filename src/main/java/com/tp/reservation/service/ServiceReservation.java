@@ -48,30 +48,30 @@ public class ServiceReservation {
             throw new ReservationException("La date de fin doit être égale ou postérieure à la date de début");
         }
 
-        // RG05: Student existence
+        // RG05
         boolean etudiantExiste = etudiants.stream()
                 .anyMatch(e -> e.getId().equals(idEtudiant));
         if (!etudiantExiste) {
             throw new ReservationException("L'étudiant avec l'identifiant " + idEtudiant + " n'existe pas");
         }
 
-        // RG05: Product existence
+        // RG05
         boolean produitExiste = produits.stream()
                 .anyMatch(p -> p.getId().equals(idProduit));
         if (!produitExiste) {
             throw new ReservationException("Le produit avec l'identifiant " + idProduit + " n'existe pas");
         }
 
-        // RG04: Duration in calendar days (inclusive)
+        // RG04
         long daysBetween = ChronoUnit.DAYS.between(dateDebut, dateFin);
         int duree = (int) daysBetween + 1;
 
-        // RG06: Max 7 days
+        // RG06
         if (duree > 7) {
             throw new ReservationException("La durée maximale d'une réservation est de 7 jours");
         }
 
-        // RG07: Max 2 active/upcoming orders per student
+        // RG07
         long activeOrders = commandes.stream()
                 .filter(c -> c.getIdEtudiant().equals(idEtudiant))
                 .filter(c -> !c.getDateFin().isBefore(LocalDate.now()))
@@ -80,7 +80,7 @@ public class ServiceReservation {
             throw new ReservationException("L'étudiant a déjà atteint le quota maximal de 2 commandes");
         }
 
-        // RG08: Product availability (no date overlap, bounds inclusive)
+        // RG08
         boolean disponible = commandes.stream()
                 .filter(c -> c.getIdProduit().equals(idProduit))
                 .noneMatch(c -> !dateDebut.isAfter(c.getDateFin()) && !dateFin.isBefore(c.getDateDebut()));
@@ -94,16 +94,16 @@ public class ServiceReservation {
                 .findFirst()
                 .orElseThrow();
 
-        // RG10 & RG12: Rent = rate * days, rounded HALF_UP to 2 decimals
+        // RG10 & RG12
         BigDecimal montantLocation = produit.getTarifJournalier()
                 .multiply(BigDecimal.valueOf(duree))
                 .setScale(2, RoundingMode.HALF_UP);
 
-        // RG11: Total = Rent + Deposit
+        // RG11
         BigDecimal caution = produit.getCaution().setScale(2, RoundingMode.HALF_UP);
         BigDecimal montantTotal = montantLocation.add(caution);
 
-        // RG13: Unique reference
+        // RG13
         String reference = "CMD-" + String.format("%03d", compteurReference++);
 
         // Create and save order
