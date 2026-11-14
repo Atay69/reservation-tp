@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Etudiant.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">reservation-tp</a> &gt; <a href="index.source.html" class="el_package">com.tp.reservation.model</a> &gt; <span class="el_source">Etudiant.java</span></div><h1>Etudiant.java</h1><pre class="source lang-java linenums">package com.tp.reservation.model;
+
+public class Etudiant {
+    private final String id;
+    private final String nom;
+    private final String prenom;
+
+<span class="fc" id="L8">    public Etudiant(String id, String nom, String prenom) {</span>
+<span class="fc bfc" id="L9" title="All 4 branches covered.">        if (id == null || id.isBlank()) {</span>
+<span class="fc" id="L10">            throw new IllegalArgumentException(&quot;L'identifiant de l'étudiant ne peut pas être vide&quot;);</span>
+        }
+<span class="fc" id="L12">        this.id = id;</span>
+<span class="fc" id="L13">        this.nom = nom;</span>
+<span class="fc" id="L14">        this.prenom = prenom;</span>
+<span class="fc" id="L15">    }</span>
+
+<span class="fc" id="L17">    public String getId() { return id; }</span>
+<span class="fc" id="L18">    public String getNom() { return nom; }</span>
+<span class="fc" id="L19">    public String getPrenom() { return prenom; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
