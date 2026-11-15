@@ -6,22 +6,47 @@ import com.tp.reservation.model.Etudiant;
 import com.tp.reservation.model.Produit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class ServiceReservationTest {
 
+    @InjectMocks
     private ServiceReservation service;
+
+    @Mock
+    private Etudiant mockEtudiant;
+
+    @Mock
+    private Produit mockProduit;
+
     private final LocalDate today = LocalDate.now();
 
     @BeforeEach
     void setUp() {
-        service = new ServiceReservation();
-        service.ajouterEtudiant(new Etudiant("E001", "Dupont", "Marie"));
-        service.ajouterProduit(new Produit("P001", "Ordinateur", new BigDecimal("10.00"), new BigDecimal("100.00")));
+        // 1. Configure the Student mock
+        lenient().when(mockEtudiant.getId()).thenReturn("E001");
+
+        // 2. Configure the Product mock
+        lenient().when(mockProduit.getId()).thenReturn("P001");
+        lenient().when(mockProduit.getTarifJournalier()).thenReturn(new BigDecimal("10.00"));
+        lenient().when(mockProduit.getCaution()).thenReturn(new BigDecimal("100.00"));
+
+        // 3. Add the mocks to the service
+        service.ajouterEtudiant(mockEtudiant);
+        service.ajouterProduit(mockProduit);
+        
+        // 4. Add a second real student for overlap tests (RG08)
+        service.ajouterEtudiant(new Etudiant("E002", "Martin", "Paul"));
     }
 
     // --- Cycle 4: Validation (RG01, RG02, RG03) ---
@@ -151,5 +176,22 @@ class ServiceReservationTest {
         
         assertThrows(ReservationException.class, () -> 
             service.reserver("E002", "P001", end, end.plusDays(2)));
+    }
+
+    // --- Cycle 11: Mockito Verification ---
+    @Test
+    void should_use_both_mocks_for_reservation() {
+        LocalDate start = LocalDate.now().plusDays(10);
+        Commande c = service.reserver("E001", "P001", start, start.plusDays(4));
+
+        assertNotNull(c);
+        assertEquals(5, c.getDuree());
+        assertEquals(0, c.getMontantTotal().compareTo(new BigDecimal("150.00")));
+
+        // Verify that the service interacted with the Mocks!
+        verify(mockEtudiant, times(1)).getId();
+        verify(mockProduit, times(2)).getId();
+        verify(mockProduit, times(1)).getTarifJournalier();
+        verify(mockProduit, times(1)).getCaution();
     }
 }

@@ -1,6 +1,6 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
 reservation-tp,com.tp.reservation.exception,ReservationException,0,4,0,0,0,2,0,1,0,1
-reservation-tp,com.tp.reservation.service,ServiceReservation,14,266,5,27,1,57,4,23,0,11
+reservation-tp,com.tp.reservation.service,ServiceReservation,2,278,2,30,0,58,2,25,0,11
 reservation-tp,com.tp.reservation.model,Etudiant,0,31,0,4,0,10,0,6,0,4
 reservation-tp,com.tp.reservation.model,Produit,5,54,4,8,1,15,4,7,0,5
 reservation-tp,com.tp.reservation.model,Commande,0,57,0,0,0,20,0,10,0,10
