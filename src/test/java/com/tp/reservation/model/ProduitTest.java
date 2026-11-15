@@ -38,4 +38,15 @@ class ProduitTest {
         Produit p = new Produit("P002", "Kit", new BigDecimal("5.00"), BigDecimal.ZERO);
         assertEquals(0, p.getCaution().compareTo(BigDecimal.ZERO));
     }
+    @Test
+    void should_reject_null_rate() {
+    assertThrows(IllegalArgumentException.class,
+            () -> new Produit("P001", "Ordinateur", null, new BigDecimal("100.00")));
+    }
+
+    @Test
+    void should_reject_null_deposit() {
+    assertThrows(IllegalArgumentException.class,
+            () -> new Produit("P001", "Ordinateur", new BigDecimal("10.00"), null));
+    }
 }

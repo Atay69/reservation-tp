@@ -1,5 +1,5 @@
 package com.tp.reservation.service;
-
+import org.mockito.MockedStatic;
 import com.tp.reservation.exception.ReservationException;
 import com.tp.reservation.model.Commande;
 import com.tp.reservation.model.Etudiant;
@@ -193,5 +193,90 @@ class ServiceReservationTest {
         verify(mockProduit, times(2)).getId();
         verify(mockProduit, times(1)).getTarifJournalier();
         verify(mockProduit, times(1)).getCaution();
+    }
+    @Test
+    void should_allow_reservation_before_later_non_overlapping_reservation() {
+    LocalDate laterStart = today.plusDays(20);
+    LocalDate laterEnd = laterStart.plusDays(2);
+    service.reserver("E001", "P001", laterStart, laterEnd);
+
+    LocalDate earlierStart = today.plusDays(10);
+    Commande earlier = service.reserver(
+            "E002", "P001", earlierStart, earlierStart.plusDays(2));
+
+    assertNotNull(earlier);
+    assertEquals(earlierStart, earlier.getDateDebut());
+    }
+    @Test
+    void should_assign_unique_references_to_successive_orders() {
+    LocalDate firstDate = today.plusDays(10);
+    LocalDate secondDate = today.plusDays(20);
+
+    Commande first = service.reserver("E001", "P001", firstDate, firstDate);
+    Commande second = service.reserver("E001", "P001", secondDate, secondDate);
+
+    assertEquals("CMD-001", first.getReference());
+    assertEquals("CMD-002", second.getReference());
+    }
+    @Test
+    void should_not_register_rejected_third_order() {
+    LocalDate firstDate = today.plusDays(10);
+    LocalDate secondDate = today.plusDays(20);
+    LocalDate rejectedDate = today.plusDays(30);
+
+    service.reserver("E001", "P001", firstDate, firstDate);
+    service.reserver("E001", "P001", secondDate, secondDate);
+
+    assertThrows(ReservationException.class,
+            () -> service.reserver("E001", "P001", rejectedDate, rejectedDate));
+
+    Commande otherStudentOrder =
+            service.reserver("E002", "P001", rejectedDate, rejectedDate);
+
+    assertEquals("CMD-003", otherStudentOrder.getReference());
+    }
+    @Test
+    void should_allow_reservation_starting_the_day_after_another_ends() {
+    LocalDate firstStart = today.plusDays(10);
+    LocalDate firstEnd = firstStart.plusDays(2);
+
+    service.reserver("E001", "P001", firstStart, firstEnd);
+
+    LocalDate nextStart = firstEnd.plusDays(1);
+    Commande next = service.reserver("E002", "P001", nextStart, nextStart.plusDays(1));
+
+    assertEquals(nextStart, next.getDateDebut());
+    }
+    @Test
+    void should_allow_same_dates_for_different_products() {
+    service.ajouterProduit(
+            new Produit("P002", "Écran", new BigDecimal("5.00"), BigDecimal.ZERO));
+
+    LocalDate start = today.plusDays(10);
+    LocalDate end = start.plusDays(2);
+
+    service.reserver("E001", "P001", start, end);
+    Commande otherProductOrder = service.reserver("E002", "P002", start, end);
+
+    assertEquals("P002", otherProductOrder.getIdProduit());
+    }
+    @Test
+    void should_ignore_expired_orders_when_counting_quota() {
+    LocalDate firstDate = today.plusDays(10);
+
+    service.reserver("E001", "P001", firstDate, firstDate);
+    service.reserver("E001", "P001", firstDate.plusDays(1), firstDate.plusDays(1));
+
+    LocalDate simulatedToday = firstDate.plusDays(2);
+
+    try (MockedStatic<LocalDate> mockedNow =
+                 mockStatic(LocalDate.class, CALLS_REAL_METHODS)) {
+        mockedNow.when(() -> LocalDate.now()).thenReturn(simulatedToday);
+
+        Commande thirdOrder =
+                service.reserver("E001", "P001", simulatedToday, simulatedToday);
+
+        assertNotNull(thirdOrder);
+    }
     }
 }
