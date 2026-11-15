@@ -9,15 +9,15 @@ public class Produit {
     private final BigDecimal caution;
 
 <span class="fc" id="L11">    public Produit(String id, String libelle, BigDecimal tarifJournalier, BigDecimal caution) {</span>
-        // RG01: ID is mandatory
+        // RG01
 <span class="pc bpc" id="L13" title="2 of 4 branches missed.">        if (id == null || id.isBlank()) {</span>
 <span class="nc" id="L14">            throw new IllegalArgumentException(&quot;L'identifiant du produit ne peut pas être vide&quot;);</span>
         }
-        // RG09: Rate must be strictly positive
+        // RG09
 <span class="pc bpc" id="L17" title="1 of 4 branches missed.">        if (tarifJournalier == null || tarifJournalier.compareTo(BigDecimal.ZERO) &lt;= 0) {</span>
 <span class="fc" id="L18">            throw new IllegalArgumentException(&quot;Le tarif journalier doit être strictement positif&quot;);</span>
         }
-        // RG09: Deposit must be positive or zero
+        // RG09
 <span class="pc bpc" id="L21" title="1 of 4 branches missed.">        if (caution == null || caution.compareTo(BigDecimal.ZERO) &lt; 0) {</span>
 <span class="fc" id="L22">            throw new IllegalArgumentException(&quot;La caution doit être positive ou nulle&quot;);</span>
         }
